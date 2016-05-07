@@ -99,6 +99,7 @@ class RCSwitch {
     static bool receiveProtocol1(unsigned int changeCount);
     static bool receiveProtocol2(unsigned int changeCount);
     static bool receiveProtocol3(unsigned int changeCount);
+    static bool receiveProtocol4(unsigned int changeCount);
     int nReceiverInterrupt;
     #endif
     int nTransmitterPin;
