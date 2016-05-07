@@ -6,63 +6,40 @@
   If you want to visualize a telegram copy the raw data and
   paste it into http://test.sui.li/oszi/
 
-  Connect receiver to D3 pin and open serial connection @ 9600 bauds or listen
-  Spark Cloud for "tristate-received" event.
+  Connect receiver to D2 pin and open serial connection @ 9600 bauds
 */
 
 #include "RCSwitch/RCSwitch.h"
 
 RCSwitch mySwitch = RCSwitch();
 int ledPin = D7;
-int inputPin = D3;
+int inputPin = D2;
 
-static char *bin2tristate(char *bin) {
-  char returnValue[50];
-  for (int i=0; i<50; i++) {
-    returnValue[i] = '\0';
-  }
-  int pos = 0;
-  int pos2 = 0;
-  while (bin[pos]!='\0' && bin[pos+1]!='\0') {
-    if (bin[pos]=='0' && bin[pos+1]=='0') {
-      returnValue[pos2] = '0';
-    } else if (bin[pos]=='1' && bin[pos+1]=='1') {
-      returnValue[pos2] = '1';
-    } else if (bin[pos]=='0' && bin[pos+1]=='1') {
-      returnValue[pos2] = 'F';
-    } else {
-      return "not applicable";
-    }
-    pos = pos+2;
-    pos2++;
-  }
-  returnValue[pos2] = '\0';
-  return returnValue;
-}
-
-void output(unsigned long decimal, unsigned int length, unsigned int delay, unsigned int* raw, unsigned int protocol) {
+void output(unsigned long long decimal, unsigned int length, unsigned int delay, unsigned int* raw, unsigned int protocol) {
 
   if (decimal == 0) {
     Serial.print("Unknown encoding.");
   } else {
     char* b = mySwitch.dec2binWzerofill(decimal, length);
-    char* tristate = bin2tristate(b);
 
-    Serial.print("Decimal: ");
-    Serial.print(decimal);
+    Serial.print("Decimal top 32 bits: ");
+    Serial.print((unsigned long)(decimal >> 32));
+    Serial.print(" bottom 32 bits: ");
+    Serial.println((unsigned long)(decimal));
+
+    Serial.print("Hex: ");
+    Serial.print((unsigned long)(decimal >> 32), HEX);
+    Serial.println((unsigned long)(decimal), HEX);
+    
     Serial.print(" (");
     Serial.print( length );
     Serial.print("Bit) Binary: ");
     Serial.print( b );
-    Serial.print(" Tri-State: ");
-    Serial.print( tristate );
     Serial.print(" PulseLength: ");
     Serial.print(delay);
     Serial.print(" microseconds");
     Serial.print(" Protocol: ");
     Serial.println(protocol);
-
-    Spark.publish("tristate-received", String(delay) + " " + String(tristate));
   }
 
   Serial.print("Raw data: ");
@@ -89,7 +66,9 @@ void loop() {
   digitalWrite(ledPin, inputPinState);
 
   if (mySwitch.available()) {
+    mySwitch.disableReceive();
     output(mySwitch.getReceivedValue(), mySwitch.getReceivedBitlength(), mySwitch.getReceivedDelay(), mySwitch.getReceivedRawdata(), mySwitch.getReceivedProtocol());
+    mySwitch.enableReceive(0);
     mySwitch.resetAvailable();
   }
 }

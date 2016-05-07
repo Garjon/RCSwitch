@@ -33,7 +33,7 @@
 #include "spark_wiring_usbserial.h"
 
 #if not defined( RCSwitchDisableReceiving )
-unsigned long RCSwitch::nReceivedValue = NULL;
+unsigned long long RCSwitch::nReceivedValue = NULL;
 unsigned int RCSwitch::nReceivedBitlength = 0;
 unsigned int RCSwitch::nReceivedDelay = 0;
 unsigned int RCSwitch::nReceivedProtocol = 0;
@@ -631,7 +631,7 @@ void RCSwitch::resetAvailable() {
   RCSwitch::nReceivedValue = NULL;
 }
 
-unsigned long RCSwitch::getReceivedValue() {
+unsigned long long RCSwitch::getReceivedValue() {
     return RCSwitch::nReceivedValue;
 }
 
@@ -656,7 +656,7 @@ unsigned int* RCSwitch::getReceivedRawdata() {
  */
 bool RCSwitch::receiveProtocol1(unsigned int changeCount){
 
-      unsigned long code = 0;
+      unsigned long long code = 0;
       unsigned long delay = RCSwitch::timings[0] / 31;
       unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;
 
@@ -692,7 +692,7 @@ bool RCSwitch::receiveProtocol1(unsigned int changeCount){
 
 bool RCSwitch::receiveProtocol2(unsigned int changeCount){
 
-      unsigned long code = 0;
+      unsigned long long code = 0;
       unsigned long delay = RCSwitch::timings[0] / 10;
       unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;
 
@@ -730,7 +730,7 @@ bool RCSwitch::receiveProtocol2(unsigned int changeCount){
  */
 bool RCSwitch::receiveProtocol3(unsigned int changeCount){
 
-      unsigned long code = 0;
+      unsigned long long code = 0;
       unsigned long delay = RCSwitch::timings[0] / PROTOCOL3_SYNC_FACTOR;
       unsigned long delayTolerance = delay * RCSwitch::nReceiveTolerance * 0.01;
 
